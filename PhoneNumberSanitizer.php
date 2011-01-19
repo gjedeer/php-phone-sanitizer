@@ -46,27 +46,89 @@ class PhoneNumberSanitizer
         throw new PhoneNumberSanitizerCountryException('Wrong country code: ' . $countrycode);
 	}
 
+	function StripKnownNonAlpha($number)
+	{
+		$known = array(' ', '-', '(', ')', '.');
+		$replace = array_fill(0, sizeof($known), '');
+		return str_replace($known, $replace, $number);
+		
+	}
+
+	function CountFirstZeros($number)
+	{
+		$nz = 0;
+		for($i = 0; $i < strlen($number); $i++)
+		{
+			if($number[$i] == '0')
+			{
+				$nz++;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return $nz;
+	}
+
 	function Sanitize($countrycode, $number)
 	{
+		echo "\n\nINPUT: $countrycode\t $number\n\n";
 		$prefixes = $this->GetPrefixes($countrycode);
 
 		$number = trim($number);
+		$original_number = $number;
 
 		if(sizeof($prefixes) == 1)
 		{
 			$prefix = $prefixes[0];
-			/* case 1: no country prefix, 516661666 or (91)4640028 or 914640028 */
+			/* case 1: no country prefix */
 			if($number[0] != '+')
-			{
+			{    
+				/* Strip leading zeros */
+				$zeros = $this->CountFirstZeros($number);
+				if($zeros > 0 && $zeros < 4)
+				{
+					$number = substr($number, $zeros);
+				}
 
+				/* 48516661666 */
+				if(!strncmp($prefix, $number, strlen($prefix)))
+				{
+					return '+' . $number;
+				}
+				/* 516661666 or (91)4640028 or 914640028 */
+				else
+				{
+					return '+' . $prefix .  $this->StripKnownNonAlpha($number);
+				}
+			}
+			else
+			{
+				return $number;
 			}
 		}
 		else
 		{
+			if($number[0] == '+')
+			{
+				return $number;
+			}
+			else
+			{
+				
+			}
 		}
 		
-
-		return '666!';
+		if($this->strict)
+		{
+			throw new PhoneNumberSanitizerException('Could not sanitize ' . $original_number);
+		}
+		else
+		{
+			return $original_number;
+		}
 	}
 }
 
