@@ -28,7 +28,14 @@ class SanitizeTest extends PHPUnit_Framework_TestCase
 		foreach($this->cases as $case)
 		{
 			$number = $sanitizer->Sanitize($case[0], $case[1]);
-			$this->assertEquals($case[2], $number);
+			if($case[2])
+			{
+				$this->assertEquals($case[2], $number);
+			}
+			else
+			{
+				$this->assertEquals($case[1], $number);
+			}
 		}
 	}
 

@@ -74,7 +74,6 @@ class PhoneNumberSanitizer
 
 	function Sanitize($countrycode, $number)
 	{
-		echo "\n\nINPUT: $countrycode\t $number\n\n";
 		$prefixes = $this->GetPrefixes($countrycode);
 
 		$number = trim($number);
@@ -96,7 +95,7 @@ class PhoneNumberSanitizer
 				/* 48516661666 */
 				if(!strncmp($prefix, $number, strlen($prefix)))
 				{
-					return '+' . $number;
+					return '+' . $this->StripKnownNonAlpha($number);
 				}
 				/* 516661666 or (91)4640028 or 914640028 */
 				else
@@ -106,18 +105,30 @@ class PhoneNumberSanitizer
 			}
 			else
 			{
-				return $number;
+				return $this->StripKnownNonAlpha($number);
 			}
 		}
 		else
 		{
 			if($number[0] == '+')
 			{
-				return $number;
+				return $this->StripKnownNonAlpha($number);
 			}
 			else
 			{
-				
+				$matched_pfx = false;
+				foreach($prefixes as $prefix)
+				{
+					if(!strncmp($prefix, $number, strlen($prefix)))
+					{
+						$matched_pfx = $prefix;
+					}
+				}
+				if($matched_pfx)
+				{
+					return '+' . $this->StripKnownNonAlpha($number);
+				}
+				// pass further
 			}
 		}
 		
