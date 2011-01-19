@@ -10,7 +10,7 @@ class SanitizeTest extends PHPUnit_Framework_TestCase
 		* if ExpectedOutput is NULL, an exception is expected
 		*/
 	var $cases = array(
-#		array('PL', '516661666', '+48516661666'),
+		array('PL', '516661666', '+48516661666'),
 		array('PL', '48516661666', '+48516661666'),
 		array('PL', '+48516661666', '+48516661666'),
 		array('PL', '0048516661666', '+48516661666'),

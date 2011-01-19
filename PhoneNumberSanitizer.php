@@ -81,7 +81,7 @@ class PhoneNumberSanitizer
 
 		if(sizeof($prefixes) == 1)
 		{
-			$prefix = $prefixes[0];
+			$prefix = $prefixes;
 			/* case 1: no country prefix */
 			if($number[0] != '+')
 			{    
