@@ -1,4 +1,6 @@
 <?php
+# License:
+# wget -O - https://raw.github.com/avsm/openbsd-xen-sys/master/sys/timetc.h | head -n 8 |  sed 's/Poul-Henning Kamp/GDR!/g' | sed 's/phk@FreeBSD.ORG/gdr@go2.pl/g'
 
 class PhoneNumberSanitizerException extends Exception {};
 class PhoneNumberSanitizerCountryException extends Exception {};
