@@ -1,6 +1,7 @@
 Turn bloody mess entered by users during registration into a standard phone number representation.
 
 Example:
+
 * "(231) 8180078" becomes "+12318180078"
 * "516661666" becomes "+48516661666"
 
