@@ -107,7 +107,21 @@ class PhoneNumberSanitizer
 			}
 			else
 			{
-				return $this->StripKnownNonAlpha($number);
+				$striped_number= $this->StripKnownNonAlpha($number);
+				if(!strncmp("+".$prefix, $striped_number, (strlen($prefix)+1))){
+					return $striped_number;
+					
+				}
+				else{
+					if($this->strict)
+						{
+							throw new PhoneNumberSanitizerException('Could not sanitize ' . $original_number);
+						}
+					else
+						{
+							return $striped_number;
+						}
+				}
 			}
 		}
 		else
