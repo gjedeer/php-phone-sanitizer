@@ -2,8 +2,10 @@
 # License:
 # wget -O - https://raw.github.com/avsm/openbsd-xen-sys/master/sys/timetc.h | head -n 8 |  sed 's/Poul-Henning Kamp/GDR!/g' | sed 's/phk@FreeBSD.ORG/gdr@go2.pl/g'
 
-class PhoneNumberSanitizerException extends Exception {};
-class PhoneNumberSanitizerCountryException extends Exception {};
+abstract class AbstractPhoneNumberSanitizerException extends Exception {};
+class PhoneNumberSanitizerException extends AbstractPhoneNumberSanitizerException {};
+class PhoneNumberSanitizerCountryException extends AbstractPhoneNumberSanitizerException {};
+
 
 class PhoneNumberSanitizer
 {
@@ -74,6 +76,30 @@ class PhoneNumberSanitizer
 		return $nz;
 	}
 
+
+	function StripPhonePrefix($countrycode, $number){
+		
+		$local_number=$this->Sanitize($countrycode, $number);
+		$prefix = $this->GetPrefixes($countrycode);
+		try{
+			$strip_phone_prefix=substr($local_number, (strlen($prefix)+1));
+		}
+		catch (AbstractPhoneNumberSanitizerException $e){
+			if($this->strict)
+			{
+				throw $e;
+			}
+			else
+			{
+				return $number;
+			}
+				
+		}
+		return $strip_phone_prefix;
+		
+	}
+
+
 	function Sanitize($countrycode, $number)
 	{
 		$prefixes = $this->GetPrefixes($countrycode);
@@ -107,7 +133,21 @@ class PhoneNumberSanitizer
 			}
 			else
 			{
-				return $this->StripKnownNonAlpha($number);
+				$striped_number= $this->StripKnownNonAlpha($number);
+				if(!strncmp("+".$prefix, $striped_number, (strlen($prefix)+1))){
+					return $striped_number;
+					
+				}
+				else{
+					if($this->strict)
+						{
+							throw new PhoneNumberSanitizerException('Could not sanitize ' . $original_number);
+						}
+					else
+						{
+							return $striped_number;
+						}
+				}
 			}
 		}
 		else
